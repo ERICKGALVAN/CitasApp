@@ -1,17 +1,16 @@
 using API.DTOs;
 using API.Entities;
+using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace API.Data;
-
+namespace API.data;
 public class UserRepository : IUserRepository
 {
     private readonly DataContext _context;
     private readonly IMapper _mapper;
-
     public UserRepository(DataContext context, IMapper mapper)
     {
         _context = context;
@@ -26,11 +25,14 @@ public class UserRepository : IUserRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<MemberDto>> GetMembersAsync()
+    public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
     {
-        return await _context.Users
+        var query = _context.Users
             .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
-            .ToListAsync();
+            .AsNoTracking();
+
+        return await PagedList<MemberDto>
+            .CreateAsync(query, userParams.PageNumber, userParams.PageSize);
     }
 
     public async Task<AppUser> GetUserByIdAsync(int id)
@@ -40,16 +42,13 @@ public class UserRepository : IUserRepository
 
     public async Task<AppUser> GetUserByUsernameAsync(string username)
     {
-        return await _context.Users
-            .Include(p => p.Photos)
-            .SingleOrDefaultAsync(u => u.UserName == username);
+        return await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
     }
 
     public async Task<IEnumerable<AppUser>> GetUsersAsync()
     {
-        return await _context.Users
-            .Include(p => p.Photos)
-            .ToListAsync();
+        return await _context.Users.Include(p => p.Photos).ToListAsync();
+
     }
 
     public async Task<bool> SaveAllAsync()
@@ -61,4 +60,6 @@ public class UserRepository : IUserRepository
     {
         _context.Entry(user).State = EntityState.Modified;
     }
+
+
 }
