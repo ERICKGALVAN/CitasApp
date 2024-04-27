@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { IMember } from 'src/app/_models/imember';
+import { IMember } from 'src/app/_models/member';
 import { FileUploader } from 'ng2-file-upload';
 import { environment } from 'src/environments/environment.development';
-import { IUser } from 'src/app/_models/iuser';
+import { IUser } from 'src/app/_models/user';
 import { AccountService } from 'src/app/_services/account.service';
 import { take } from 'rxjs';
-import { IPhoto } from 'src/app/_models/iphoto';
+import { IPhoto } from 'src/app/_models/photo';
 import { MembersService } from 'src/app/_services/members.service';
 
 @Component({
